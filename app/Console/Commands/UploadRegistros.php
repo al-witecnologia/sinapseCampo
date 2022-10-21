@@ -29,6 +29,9 @@ class UploadRegistros extends Command
 
 
     public function enviar(){
+
+        $responses = [];
+
         $arquivos = Arquivo::where([
             ['enviado_em','=', null]
         ])->get();
@@ -41,22 +44,28 @@ class UploadRegistros extends Command
                 
                 $content = Storage::get($arquivo->nome);
 
-                $response = Http::attach('arquivo', $content, $arquivo->nome)->post(env('API_URL'));
+                $response = Http::withToken(env('API_KEY'))->attach('arquivo', $content, $arquivo->nome)->post(env('API_URL'));
+                
+                if($response->successful()){
+                    if($response->json('hash') == $arquivo->hash){
+                        $arquivo->enviado_em    = Carbon::now();
+                        $arquivo->save();                    
+                    }
 
-                if($response == $arquivo->hash){
-                    $arquivo->enviado_em    = Carbon::now();
-                    $arquivo->save();                    
+
+                    $upload = Upload::create([
+                        'arquivo_id'    =>  $arquivo->id,
+                        'response'      =>  $response->json('hash')                    
+                    ]);
+
+                    array_push($responses, $response->body());
                 }
                 else{
-                    $response = null;
+                    return $response->status();
                 }
 
-                $upload = Upload::create([
-                    'arquivo_id'    =>  $arquivo->id,
-                    'response'      =>  $response                    
-                ]);
-
             }
+            return $responses;
         }
 
     }
@@ -73,7 +82,8 @@ class UploadRegistros extends Command
 
         if(count($registros)<=0){
             echo 'Vazio';
-            $this->enviar();
+            $response = $this->enviar();
+            print_r($response);
         }
         else{            
             $arquivoNome = 'arquivos/' . Carbon::now()->timestamp . '.json';
@@ -92,7 +102,8 @@ class UploadRegistros extends Command
                 $registro->lido_em      =   Carbon::now();
                 $registro->save();
             }
-            $this->enviar();
+            $response = $this->enviar();
+            print_r($response);
 
         }
 

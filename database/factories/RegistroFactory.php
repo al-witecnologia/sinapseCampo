@@ -21,8 +21,7 @@ class RegistroFactory extends Factory
             'tag'                   =>  fake()->ean8(),
             'valor'                 =>  fake()->randomFloat(2,18,40),
             'tipo'                  =>  1,
-            'data_hora'             =>  fake()->dateTimeThisMonth(),
-            'data_hora_registro'    =>  fake()->dateTimeThisMonth()
+            'data_hora'             =>  fake()->dateTimeThisMonth(),            
         ];
     }
 }
