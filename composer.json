@@ -1,7 +1,7 @@
 {
-    "name": "laravel/laravel",
+    "name": "al-witecnologia/sinapsecampo",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "Upload dados SInapse",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
