@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Arquivo;
+use App\Models\Parametro;
 use App\Models\Registro;
 use App\Models\Upload;
 use Carbon\Carbon;
@@ -29,6 +30,8 @@ class UploadRegistros extends Command
 
 
     public function enviar(){
+        
+        $parametro = Parametro::find(1);
 
         $responses = [];
 
@@ -44,7 +47,7 @@ class UploadRegistros extends Command
                 
                 $content = Storage::get($arquivo->nome);
 
-                $response = Http::withToken(env('API_KEY'))->attach('arquivo', $content, $arquivo->nome)->post(env('API_URL'));
+                $response = Http::withToken($parametro->token)->attach('arquivo', $content, $arquivo->nome)->post($parametro->path);
                 
                 if($response->successful()){
                     if($response->json('hash') == $arquivo->hash){
